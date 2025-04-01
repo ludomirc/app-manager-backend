@@ -55,7 +55,7 @@ public class ApplicationController {
         }
 
         Application application = applicationMapper.fromDto(dto, user, enterprise);
-        Application savedApplication = applicationService.createApplication(user, enterprise, application.getNotes(),application.getName());
+        Application savedApplication = applicationService.createApplication(application);
         ApplicationDto responseDto = applicationMapper.toDto(savedApplication);
 
         return ResponseEntity.ok(responseDto);

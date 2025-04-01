@@ -41,7 +41,8 @@ class ApplicationServiceImplTest {
     void shouldCreateApplication() {
         when(applicationRepository.save(ArgumentMatchers.any(Application.class))).thenReturn(application);
 
-        Application createdApp = applicationService.createApplication(user, enterprise, "Test Notes","Test Name");
+        Application expectedApplication = new Application(user, enterprise,  "Test Notes","Test Name");
+        Application createdApp = applicationService.createApplication(expectedApplication);
 
         assertThat(createdApp, is(notNullValue()));
         assertThat(createdApp.getUser(), is(equalTo(user)));

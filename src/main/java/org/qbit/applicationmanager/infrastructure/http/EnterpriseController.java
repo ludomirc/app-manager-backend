@@ -1,5 +1,7 @@
 package org.qbit.applicationmanager.infrastructure.http;
 
+import java.util.List;
+
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.service.EnterpriseService;
@@ -10,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.security.core.Authentication;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/enterprises")
@@ -55,4 +55,20 @@ public class EnterpriseController {
         }
         return enterprise.getUser().getUserName().equals(username);
     }
+
+    @GetMapping
+    public ResponseEntity<List<EnterpriseDto>> getEnterprisesForCurrentUser(Authentication authentication) {
+        User user = userService.getUserByUsername(authentication.getName());
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        List<EnterpriseDto> dtos = enterpriseService.getEnterprisesByUser(user)
+                .stream()
+                .map(enterpriseMapper::toDto)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
+
 }

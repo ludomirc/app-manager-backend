@@ -48,7 +48,7 @@ public class ApplicationDto {
     }
 
     public void setName(String name) {
-
+        this.name = name;
     }
 
     @Override

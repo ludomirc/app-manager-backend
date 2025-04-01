@@ -19,8 +19,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Application createApplication(User user, Enterprise enterprise, String notes,String  name) {
-        Application application = new Application(user, enterprise, notes,name);
+    public Application createApplication(Application application) {
         return applicationRepository.save(application);
     }
 

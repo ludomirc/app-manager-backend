@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ApplicationService {
-    Application createApplication(User user, Enterprise enterprise, String note, String name);
+    Application createApplication(Application application);
     Optional<Application> getApplicationById(Long id);
     List<Application> getApplicationsByUser(User user);
     List<Application> getApplicationsByEnterprise(Enterprise enterprise);

@@ -45,7 +45,9 @@ class TaskServiceImplTest {
     void shouldCreateTask() {
         when(taskRepository.save(ArgumentMatchers.any(Task.class))).thenReturn(task);
 
-        Task createdTask = taskService.createTask(user, application, "Task Note");
+        Task expectedTask = new Task(user, application,null, "Task Note");
+
+        Task createdTask = taskService.createTask(expectedTask);
 
         assertThat(createdTask, notNullValue());
         assertThat(createdTask.getUser(), equalTo(user));
