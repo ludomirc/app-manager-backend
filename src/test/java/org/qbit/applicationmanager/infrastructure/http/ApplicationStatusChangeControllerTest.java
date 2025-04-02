@@ -7,10 +7,8 @@ import org.mockito.Mockito;
 import org.qbit.applicationmanager.domain.model.Application;
 import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.ApplicationStatusChange;
-import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
 import org.qbit.applicationmanager.domain.service.ApplicationStatusChangeService;
-import org.qbit.applicationmanager.domain.service.ApplicationStatusChangeServiceImpl;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationStatusChangeDto;
 
 import org.qbit.applicationmanager.infrastructure.http.dto.mapper.ApplicationStatusChangeMapper;
@@ -20,7 +18,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -30,6 +30,9 @@ import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+
+@WithMockUser(username = "testUser", roles = "USER")
 @SuppressWarnings("removal")
 @WebMvcTest(ApplicationStatusChangeController.class)
 class ApplicationStatusChangeControllerTest {
@@ -78,11 +81,18 @@ class ApplicationStatusChangeControllerTest {
         ApplicationStatusChangeDto inputDto = new ApplicationStatusChangeDto("APPLIED", null);
         ApplicationStatusChangeDto responseDto = new ApplicationStatusChangeDto("APPLIED", change.getChangedAt());
 
-        Mockito.when(applicationService.getApplicationById(applicationId)).thenReturn(Optional.of(application));
-        Mockito.when(statusChangeService.logStatusChange(application, ApplicationStatus.APPLIED)).thenReturn(change);
-        Mockito.when(mapper.toDto(change)).thenReturn(responseDto);
+        Mockito.when(applicationService.getApplicationById(applicationId))
+                .thenReturn(Optional.of(application));
+
+        Mockito.when(statusChangeService.logStatusChange(application, ApplicationStatus.APPLIED))
+                .thenReturn(change);
+
+        Mockito.when(mapper.toDto(change)).
+                thenReturn(responseDto);
 
         mockMvc.perform(post("/api/statuses/{applicationId}", applicationId)
+                        .with(csrf())
+                        .with(user("uesr"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isOk())

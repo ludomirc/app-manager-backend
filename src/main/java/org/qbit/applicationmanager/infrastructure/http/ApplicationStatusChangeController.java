@@ -10,6 +10,7 @@ import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationStatusChan
 import org.qbit.applicationmanager.infrastructure.http.dto.mapper.ApplicationStatusChangeMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,7 +34,7 @@ public class ApplicationStatusChangeController {
     }
 
     @GetMapping("/{applicationId}/history")
-    public List<ApplicationStatusChangeDto> getHistory(@PathVariable Long applicationId) {
+    public List<ApplicationStatusChangeDto> getHistory(@PathVariable Long applicationId, Authentication authentication) {
         var changes = statusChangeService.getStatusHistory(applicationId);
         return statusChangeMapper.toDtoList(changes);
     }
@@ -41,7 +42,7 @@ public class ApplicationStatusChangeController {
     @PostMapping("/{applicationId}")
     public ResponseEntity<ApplicationStatusChangeDto> logStatusChange(
             @PathVariable Long applicationId,
-            @RequestBody ApplicationStatusChangeDto statusDto) {
+            @RequestBody ApplicationStatusChangeDto statusDto, Authentication authentication) {
 
         Application application = applicationService.getApplicationById(applicationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Application not found"));
