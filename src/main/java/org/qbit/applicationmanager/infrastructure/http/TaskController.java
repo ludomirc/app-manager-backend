@@ -8,6 +8,7 @@ import org.qbit.applicationmanager.domain.service.TaskService;
 import org.qbit.applicationmanager.domain.service.UserService;
 import org.qbit.applicationmanager.infrastructure.http.dto.TaskDto;
 import org.qbit.applicationmanager.infrastructure.http.dto.mapper.TaskMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
@@ -32,7 +33,7 @@ public class TaskController {
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto dto, Authentication authentication) {
         User user = userService.getUserByUsername(authentication.getName());
         if (user == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Optional<Application> applicationOpt = applicationService.getApplicationById(dto.getApplicationId());
@@ -43,7 +44,7 @@ public class TaskController {
         Application application = applicationOpt.get();
 
         if (!application.getUser().getUserId().equals(user.getUserId())) {
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Task task = TaskMapper.fromDto(dto, user, application);
@@ -55,13 +56,13 @@ public class TaskController {
     public ResponseEntity<TaskDto> getTask(@PathVariable Long id, Authentication authentication) {
         User user = userService.getUserByUsername(authentication.getName());
         if (user == null) {
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         return taskService.getTaskById(id)
                 .filter(task -> task.getUser().getUserId().equals(user.getUserId()))
                 .map(TaskMapper::toDto)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(403).build());
+                .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
     }
 }
