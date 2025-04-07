@@ -6,6 +6,7 @@ import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -41,5 +42,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public void deleteApplication(Long id) {
         applicationRepository.deleteById(id);
+    }
+
+    @Override
+    public Application update(Application application) {
+        Application result = applicationRepository.save(application);
+        return result;
     }
 }

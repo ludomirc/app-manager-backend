@@ -2,6 +2,7 @@ package org.qbit.applicationmanager.infrastructure.http.dto.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.qbit.applicationmanager.domain.model.Application;
+import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationDto;
@@ -21,20 +22,21 @@ public class ApplicationMapperTest {
     void shouldMapApplicationToDto() {
         User user = new User("test_user", "password");
         Enterprise enterprise = new Enterprise("Acme Corp", user);
-        Application application = new Application(user, enterprise, "Test application notes","Test Name");
+        Application application = new Application(user, enterprise, "Test application notes","Test Name",ApplicationStatus.DRAFT);
 
         ApplicationDto dto = applicationMapper.toDto(application);
 
         assertThat(dto, is(notNullValue()));
         assertThat(dto.getEnterpriseName(), is("Acme Corp"));
         assertThat(dto.getNotes(), is("Test application notes"));
+        assertThat(dto.getCurrentStatus(), is(ApplicationStatus.DRAFT.name()));
     }
 
     @Test
     void shouldMapDtoToApplication() {
         User user = new User("test_user", "password");
         Enterprise enterprise = new Enterprise("Acme Corp", user);
-        ApplicationDto dto = new ApplicationDto(null, null, "Acme Corp", null, "Mapped notes","Test Name");
+        ApplicationDto dto = new ApplicationDto(null, null, "Acme Corp", null, "Mapped notes","Test Name",ApplicationStatus.DRAFT.name());
 
         Application application = applicationMapper.fromDto(dto, user, enterprise);
 
@@ -42,5 +44,6 @@ public class ApplicationMapperTest {
         assertThat(application.getUser(), is(user));
         assertThat(application.getEnterprise(), is(enterprise));
         assertThat(application.getNotes(), is("Mapped notes"));
+        assertThat(application.getCurrentStatus(), is(equalTo(ApplicationStatus.DRAFT)));
     }
 }

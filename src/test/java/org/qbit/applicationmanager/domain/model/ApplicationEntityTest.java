@@ -13,7 +13,7 @@ public class ApplicationEntityTest {
         Enterprise enterprise = new Enterprise("TestEnterprise", user);
         LocalDateTime now = LocalDateTime.now();
 
-        Application application = new Application(user, enterprise, "TestNotes","Test Name");
+        Application application = new Application(user, enterprise, "TestNotes","Test Name",ApplicationStatus.DRAFT);
 
         assertThat(application, is(notNullValue()));
         assertThat(application.getUser(), is(notNullValue()));
@@ -21,5 +21,6 @@ public class ApplicationEntityTest {
         assertThat(application.getNotes(), is(equalTo("TestNotes")));
         assertThat(application.getCreationDate(), is(notNullValue()));
         assertThat(application.getCreationDate(), is(lessThanOrEqualTo(now.plusSeconds(1))));
+        assertThat(application.getCurrentStatus(), is(equalTo(ApplicationStatus.DRAFT)));
     }
 }

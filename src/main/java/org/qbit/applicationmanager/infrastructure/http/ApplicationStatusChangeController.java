@@ -5,7 +5,6 @@ import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.ApplicationStatusChange;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
 import org.qbit.applicationmanager.domain.service.ApplicationStatusChangeService;
-import org.qbit.applicationmanager.domain.service.ApplicationStatusChangeServiceImpl;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationStatusChangeDto;
 import org.qbit.applicationmanager.infrastructure.http.dto.mapper.ApplicationStatusChangeMapper;
 import org.springframework.http.HttpStatus;
@@ -53,10 +52,15 @@ public class ApplicationStatusChangeController {
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid application status: " + statusDto.getStatus());
         }
-
         ApplicationStatusChange change = statusChangeService.logStatusChange(application, status);
-
+        application.setCurrentStatus(status);
+        applicationService.update(application);
         return ResponseEntity.ok(statusChangeMapper.toDto(change));
+    }
+
+    @GetMapping
+    public List<String> getAvailableStatuses() {
+        return statusChangeService.getAvailableStatuses();
     }
 
 }

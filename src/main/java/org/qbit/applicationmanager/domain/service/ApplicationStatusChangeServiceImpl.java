@@ -25,4 +25,10 @@ public class ApplicationStatusChangeServiceImpl implements ApplicationStatusChan
     public List<ApplicationStatusChange> getStatusHistory(Long applicationId) {
         return repository.findByApplication_ApplicationIdOrderByChangedAtDesc(applicationId);
     }
+
+    public List<String> getAvailableStatuses() {
+        return List.of(ApplicationStatus.values()).stream()
+                .map(Enum::name)
+                .toList();
+    }
 }

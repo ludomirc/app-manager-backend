@@ -1,9 +1,11 @@
 package org.qbit.applicationmanager.infrastructure.http;
 
 import org.qbit.applicationmanager.domain.model.Application;
+import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
+import org.qbit.applicationmanager.domain.service.ApplicationStatusChangeService;
 import org.qbit.applicationmanager.domain.service.EnterpriseService;
 import org.qbit.applicationmanager.domain.service.UserService;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationDto;
@@ -25,15 +27,18 @@ public class ApplicationController {
     private final UserService userService;
     private final ApplicationMapper applicationMapper;
     private final EnterpriseService enterpriseService;
+    private final ApplicationStatusChangeService statusChangeService;
 
     public ApplicationController(ApplicationService applicationService,
                                  UserService userService,
                                  ApplicationMapper applicationMapper,
-                                 EnterpriseService enterpriseService) {
+                                 EnterpriseService enterpriseService,
+                                 ApplicationStatusChangeService statusChangeService) {
         this.applicationService = applicationService;
         this.userService = userService;
         this.applicationMapper = applicationMapper;
         this.enterpriseService = enterpriseService;
+        this.statusChangeService = statusChangeService;
     }
 
     @PostMapping
@@ -55,6 +60,7 @@ public class ApplicationController {
         }
 
         Application application = applicationMapper.fromDto(dto, user, enterprise);
+        application.setCurrentStatus(ApplicationStatus.DRAFT);
         Application savedApplication = applicationService.createApplication(application);
         ApplicationDto responseDto = applicationMapper.toDto(savedApplication);
 

@@ -12,4 +12,5 @@ public interface ApplicationService {
     List<Application> getApplicationsByUser(User user);
     List<Application> getApplicationsByEnterprise(Enterprise enterprise);
     void deleteApplication(Long id);
+    Application update(Application application);
 }

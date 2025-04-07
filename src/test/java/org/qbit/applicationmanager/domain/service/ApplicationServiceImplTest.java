@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.qbit.applicationmanager.domain.model.Application;
+import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.repository.ApplicationRepository;
@@ -34,14 +35,14 @@ class ApplicationServiceImplTest {
     void setUp() {
         user = new User("testUser", "passwordHash");
         enterprise = new Enterprise("Test Enterprise", user);
-        application = new Application(user, enterprise, "Test Notes","Test Name");
+        application = new Application(user, enterprise, "Test Notes","Test Name", ApplicationStatus.DRAFT);
     }
 
     @Test
     void shouldCreateApplication() {
         when(applicationRepository.save(ArgumentMatchers.any(Application.class))).thenReturn(application);
 
-        Application expectedApplication = new Application(user, enterprise,  "Test Notes","Test Name");
+        Application expectedApplication = new Application(user, enterprise,  "Test Notes","Test Name",ApplicationStatus.DRAFT);
         Application createdApp = applicationService.createApplication(expectedApplication);
 
         assertThat(createdApp, is(notNullValue()));

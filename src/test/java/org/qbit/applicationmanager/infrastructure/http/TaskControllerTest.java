@@ -1,10 +1,7 @@
 package org.qbit.applicationmanager.infrastructure.http;
 
 import org.junit.jupiter.api.Test;
-import org.qbit.applicationmanager.domain.model.Application;
-import org.qbit.applicationmanager.domain.model.Enterprise;
-import org.qbit.applicationmanager.domain.model.Task;
-import org.qbit.applicationmanager.domain.model.User;
+import org.qbit.applicationmanager.domain.model.*;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
 import org.qbit.applicationmanager.domain.service.TaskService;
 import org.qbit.applicationmanager.domain.service.UserService;
@@ -47,7 +44,7 @@ class TaskControllerTest {
         filedUserId.set(user, 1L);
 
         Enterprise enterprise = new Enterprise("Test Enterprise", user);
-        Application application = new Application(user, enterprise, "notes", "app name");
+        Application application = new Application(user, enterprise, "notes", "app name", ApplicationStatus.DRAFT);
         Field fieldApplicationId = Application.class.getDeclaredField("applicationId");
         fieldApplicationId.setAccessible(true);
         fieldApplicationId.set(application, 1L);

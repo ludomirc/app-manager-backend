@@ -29,14 +29,19 @@ public class Application {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "current_status", nullable = false)
+    private ApplicationStatus currentStatus;
+
     public Application() {
     }
 
-    public Application(User user, Enterprise enterprise, String notes, String name) {
+    public Application(User user, Enterprise enterprise, String notes, String name, ApplicationStatus currentStatus) {
         this.user = user;
         this.enterprise = enterprise;
         this.notes = notes;
         this.name = name;
+        this.currentStatus = currentStatus;
     }
 
     public Long getApplicationId() {
@@ -83,6 +88,14 @@ public class Application {
         this.creationDate = creationDate;
     }
 
+    public ApplicationStatus getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(ApplicationStatus currentStatus) {
+        this.currentStatus = currentStatus;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -99,11 +112,12 @@ public class Application {
     public String toString() {
         return "Application{" +
                 "applicationId=" + applicationId +
-                "name=" + name +
+                ", name='" + name + '\'' +
                 ", user=" + user +
                 ", enterprise=" + enterprise +
                 ", creationDate=" + creationDate +
                 ", notes='" + notes + '\'' +
+                ", currentStatus=" + currentStatus +
                 '}';
     }
 }
