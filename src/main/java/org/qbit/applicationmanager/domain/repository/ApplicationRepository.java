@@ -13,7 +13,4 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     @Query("SELECT a FROM Application a JOIN FETCH a.enterprise WHERE a.user = :user")
     List<Application> findByUser(User user);
-
-    @Query("SELECT t FROM Task t JOIN FETCH t.user WHERE t.application = :application")
-    List<Application> findByEnterprise(Enterprise enterprise);
 }

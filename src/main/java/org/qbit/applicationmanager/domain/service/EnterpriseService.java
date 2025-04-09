@@ -9,5 +9,4 @@ public interface EnterpriseService {
     Enterprise createEnterprise(String name, User user);
     Optional<Enterprise> getEnterpriseById(Long id);
     List<Enterprise> getEnterprisesByUser(User user);
-    void deleteEnterprise(Long id);
 }

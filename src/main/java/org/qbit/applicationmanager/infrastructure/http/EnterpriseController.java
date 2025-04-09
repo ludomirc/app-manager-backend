@@ -51,12 +51,12 @@ public class EnterpriseController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<EnterpriseDto> dtos = enterpriseService.getEnterprisesByUser(user)
+        List<EnterpriseDto> userEnterprises = enterpriseService.getEnterprisesByUser(user)
                 .stream()
                 .map(enterpriseMapper::toDto)
                 .toList();
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(userEnterprises);
     }
 
     private ResponseEntity<EnterpriseDto> getNotFoundResponseEntry() {

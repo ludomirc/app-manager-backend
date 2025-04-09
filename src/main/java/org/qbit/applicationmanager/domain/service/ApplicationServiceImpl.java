@@ -1,7 +1,6 @@
 package org.qbit.applicationmanager.domain.service;
 
 import org.qbit.applicationmanager.domain.model.Application;
-import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
@@ -35,18 +34,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<Application> getApplicationsByEnterprise(Enterprise enterprise) {
-        return applicationRepository.findByEnterprise(enterprise);
-    }
-
-    @Override
-    public void deleteApplication(Long id) {
-        applicationRepository.deleteById(id);
-    }
-
-    @Override
     public Application update(Application application) {
-        Application result = applicationRepository.save(application);
-        return result;
+        return applicationRepository.save(application);
     }
 }

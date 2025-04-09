@@ -37,9 +37,4 @@ public class TaskServiceImpl implements TaskService {
     public List<Task> getTasksByApplication(Application application) {
         return taskRepository.findByApplication(application);
     }
-
-    @Override
-    public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
-    }
 }

@@ -32,9 +32,4 @@ public class EnterpriseServiceImpl implements EnterpriseService {
     public List<Enterprise> getEnterprisesByUser(User user) {
         return enterpriseRepository.findByUser(user);
     }
-
-    @Override
-    public void deleteEnterprise(Long id) {
-        enterpriseRepository.deleteById(id);
-    }
 }

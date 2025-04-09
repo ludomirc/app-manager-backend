@@ -5,7 +5,6 @@ import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
-import org.qbit.applicationmanager.domain.service.ApplicationStatusChangeService;
 import org.qbit.applicationmanager.domain.service.EnterpriseService;
 import org.qbit.applicationmanager.domain.service.UserService;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationDto;
@@ -27,18 +26,15 @@ public class ApplicationController {
     private final UserService userService;
     private final ApplicationMapper applicationMapper;
     private final EnterpriseService enterpriseService;
-    private final ApplicationStatusChangeService statusChangeService;
 
     public ApplicationController(ApplicationService applicationService,
                                  UserService userService,
                                  ApplicationMapper applicationMapper,
-                                 EnterpriseService enterpriseService,
-                                 ApplicationStatusChangeService statusChangeService) {
+                                 EnterpriseService enterpriseService) {
         this.applicationService = applicationService;
         this.userService = userService;
         this.applicationMapper = applicationMapper;
         this.enterpriseService = enterpriseService;
-        this.statusChangeService = statusChangeService;
     }
 
     @PostMapping
@@ -55,7 +51,7 @@ public class ApplicationController {
 
         Enterprise enterprise =  enterpriseOp.get();
 
-        if (enterprise.getUser().getUserName() != user.getUserName()) {
+        if (enterprise.getUser().getUserName().equals(user.getUserName())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
@@ -88,10 +84,10 @@ public class ApplicationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<ApplicationDto> dtos = applicationService.getApplicationsByUser(user).stream()
+        List<ApplicationDto> userApplications = applicationService.getApplicationsByUser(user).stream()
                 .map(applicationMapper::toDto)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(userApplications);
     }
 }

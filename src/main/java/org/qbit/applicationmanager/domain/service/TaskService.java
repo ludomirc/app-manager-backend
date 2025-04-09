@@ -11,5 +11,4 @@ public interface TaskService {
     Optional<Task> getTaskById(Long id);
     List<Task> getTasksByUser(User user);
     List<Task> getTasksByApplication(Application application);
-    void deleteTask(Long id);
 }

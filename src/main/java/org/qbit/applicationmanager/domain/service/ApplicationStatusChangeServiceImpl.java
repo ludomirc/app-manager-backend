@@ -7,6 +7,7 @@ import org.qbit.applicationmanager.domain.repository.ApplicationStatusChangeRepo
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class ApplicationStatusChangeServiceImpl implements ApplicationStatusChangeService {
@@ -27,7 +28,7 @@ public class ApplicationStatusChangeServiceImpl implements ApplicationStatusChan
     }
 
     public List<String> getAvailableStatuses() {
-        return List.of(ApplicationStatus.values()).stream()
+        return Stream.of(ApplicationStatus.values())
                 .map(Enum::name)
                 .toList();
     }

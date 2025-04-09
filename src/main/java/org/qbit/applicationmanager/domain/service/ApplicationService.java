@@ -10,7 +10,5 @@ public interface ApplicationService {
     Application createApplication(Application application);
     Optional<Application> getApplicationById(Long id);
     List<Application> getApplicationsByUser(User user);
-    List<Application> getApplicationsByEnterprise(Enterprise enterprise);
-    void deleteApplication(Long id);
     Application update(Application application);
 }

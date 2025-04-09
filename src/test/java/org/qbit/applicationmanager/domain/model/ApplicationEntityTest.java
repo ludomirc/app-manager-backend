@@ -2,6 +2,7 @@ package org.qbit.applicationmanager.domain.model;
 
 import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
