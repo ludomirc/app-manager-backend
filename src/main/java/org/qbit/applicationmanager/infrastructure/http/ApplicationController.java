@@ -49,18 +49,24 @@ public class ApplicationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        Enterprise enterprise =  enterpriseOp.get();
+        Optional<User> enterpriseUser = enterpriseOp
+                .map(Enterprise::getUser)
+                .filter(enUser -> isTheSameUser(user, enUser));
 
-        if (enterprise.getUser().getUserName().equals(user.getUserName())) {
+        if (enterpriseUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        Application application = applicationMapper.fromDto(dto, user, enterprise);
+        Application application = applicationMapper.fromDto(dto, user, enterpriseOp.get());
         application.setCurrentStatus(ApplicationStatus.DRAFT);
         Application savedApplication = applicationService.createApplication(application);
         ApplicationDto responseDto = applicationMapper.toDto(savedApplication);
 
         return ResponseEntity.ok(responseDto);
+    }
+
+    private boolean isTheSameUser(User userLeft, User userRight) {
+        return userLeft.equals(userRight);
     }
 
     @GetMapping("/{id}")

@@ -13,14 +13,18 @@ import java.util.Optional;
 @Transactional
 public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationRepository applicationRepository;
+    private final ApplicationStatusChangeService applicationStatusChangeService;
 
-    public ApplicationServiceImpl(ApplicationRepository applicationRepository) {
+    public ApplicationServiceImpl(ApplicationRepository applicationRepository, ApplicationStatusChangeService applicationStatusChangeService) {
         this.applicationRepository = applicationRepository;
+        this.applicationStatusChangeService = applicationStatusChangeService;
     }
 
     @Override
     public Application createApplication(Application application) {
-        return applicationRepository.save(application);
+        Application cratedApplication = applicationRepository.save(application);
+        applicationStatusChangeService.logStatusChange(cratedApplication, cratedApplication.getCurrentStatus());
+        return cratedApplication;
     }
 
     @Override

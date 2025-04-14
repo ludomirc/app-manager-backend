@@ -1,11 +1,19 @@
 package org.qbit.applicationmanager.domain.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "application")
+@Table(
+        name = "application",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_application_user_name_enterprise",
+                        columnNames = {"user_id", "name", "enterprise_id" })
+        }
+)
 public class Application {
 
     @Id
