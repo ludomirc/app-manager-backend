@@ -1,11 +1,11 @@
 package org.qbit.applicationmanager.domain.service;
 
 import org.qbit.applicationmanager.domain.model.Application;
-import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -13,15 +13,18 @@ import java.util.Optional;
 @Transactional
 public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationRepository applicationRepository;
+    private final ApplicationStatusChangeService applicationStatusChangeService;
 
-    public ApplicationServiceImpl(ApplicationRepository applicationRepository) {
+    public ApplicationServiceImpl(ApplicationRepository applicationRepository, ApplicationStatusChangeService applicationStatusChangeService) {
         this.applicationRepository = applicationRepository;
+        this.applicationStatusChangeService = applicationStatusChangeService;
     }
 
     @Override
-    public Application createApplication(User user, Enterprise enterprise, String notes,String  name) {
-        Application application = new Application(user, enterprise, notes,name);
-        return applicationRepository.save(application);
+    public Application createApplication(Application application) {
+        Application cratedApplication = applicationRepository.save(application);
+        applicationStatusChangeService.logStatusChange(cratedApplication, cratedApplication.getCurrentStatus());
+        return cratedApplication;
     }
 
     @Override
@@ -35,12 +38,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<Application> getApplicationsByEnterprise(Enterprise enterprise) {
-        return applicationRepository.findByEnterprise(enterprise);
-    }
-
-    @Override
-    public void deleteApplication(Long id) {
-        applicationRepository.deleteById(id);
+    public Application update(Application application) {
+        return applicationRepository.save(application);
     }
 }

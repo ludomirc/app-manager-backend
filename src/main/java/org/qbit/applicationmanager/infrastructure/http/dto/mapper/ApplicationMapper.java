@@ -1,6 +1,7 @@
 package org.qbit.applicationmanager.infrastructure.http.dto.mapper;
 
 import org.qbit.applicationmanager.domain.model.Application;
+import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationDto;
@@ -16,7 +17,8 @@ public class ApplicationMapper {
                 application.getEnterprise() != null ? application.getEnterprise().getName() : null,
                 application.getCreationDate(),
                 application.getNotes(),
-                application.getName()
+                application.getName(),
+                application.getCurrentStatus() != null ? application.getCurrentStatus().name() : null
         );
     }
 
@@ -26,6 +28,11 @@ public class ApplicationMapper {
         application.setEnterprise(enterprise);
         application.setNotes(dto.getNotes());
         application.setName(dto.getName());
+
+        if (dto.getCurrentStatus() != null) {
+            application.setCurrentStatus(ApplicationStatus.valueOf(dto.getCurrentStatus()));
+        }
+
         return application;
     }
 }

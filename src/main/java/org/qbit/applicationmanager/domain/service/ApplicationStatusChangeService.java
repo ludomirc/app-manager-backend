@@ -9,4 +9,5 @@ import java.util.List;
 public interface ApplicationStatusChangeService {
     ApplicationStatusChange logStatusChange(Application application, ApplicationStatus status);
     List<ApplicationStatusChange> getStatusHistory(Long applicationId);
+    List<String> getAvailableStatuses();
 }

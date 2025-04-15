@@ -11,10 +11,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.qbit.applicationmanager.domain.model.Application;
-import org.qbit.applicationmanager.domain.model.Enterprise;
-import org.qbit.applicationmanager.domain.model.Task;
-import org.qbit.applicationmanager.domain.model.User;
+import org.qbit.applicationmanager.domain.model.*;
 import org.qbit.applicationmanager.domain.repository.TaskRepository;
 import java.util.Optional;
 import java.util.List;
@@ -37,7 +34,7 @@ class TaskServiceImplTest {
     @BeforeEach
     void setUp() {
         user = new User("testUser", "passwordHash");
-        application = new Application(user, new Enterprise("Test Enterprise", user), "Test Notes","Test Name");
+        application = new Application(user, new Enterprise("Test Enterprise", user), "Test Notes","Test Name", ApplicationStatus.DRAFT);
         task = new Task(user, application, LocalDateTime.now().plusDays(1), "Task Note");
     }
 
@@ -45,7 +42,9 @@ class TaskServiceImplTest {
     void shouldCreateTask() {
         when(taskRepository.save(ArgumentMatchers.any(Task.class))).thenReturn(task);
 
-        Task createdTask = taskService.createTask(user, application, "Task Note");
+        Task expectedTask = new Task(user, application,null, "Task Note");
+
+        Task createdTask = taskService.createTask(expectedTask);
 
         assertThat(createdTask, notNullValue());
         assertThat(createdTask.getUser(), equalTo(user));

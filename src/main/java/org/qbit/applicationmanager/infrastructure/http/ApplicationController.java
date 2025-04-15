@@ -1,6 +1,7 @@
 package org.qbit.applicationmanager.infrastructure.http;
 
 import org.qbit.applicationmanager.domain.model.Application;
+import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
@@ -48,17 +49,24 @@ public class ApplicationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        Enterprise enterprise =  enterpriseOp.get();
+        Optional<User> enterpriseUser = enterpriseOp
+                .map(Enterprise::getUser)
+                .filter(enUser -> isTheSameUser(user, enUser));
 
-        if (enterprise.getUser().getUserName() != user.getUserName()) {
+        if (enterpriseUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        Application application = applicationMapper.fromDto(dto, user, enterprise);
-        Application savedApplication = applicationService.createApplication(user, enterprise, application.getNotes(),application.getName());
+        Application application = applicationMapper.fromDto(dto, user, enterpriseOp.get());
+        application.setCurrentStatus(ApplicationStatus.DRAFT);
+        Application savedApplication = applicationService.createApplication(application);
         ApplicationDto responseDto = applicationMapper.toDto(savedApplication);
 
         return ResponseEntity.ok(responseDto);
+    }
+
+    private boolean isTheSameUser(User userLeft, User userRight) {
+        return userLeft.equals(userRight);
     }
 
     @GetMapping("/{id}")
@@ -82,10 +90,10 @@ public class ApplicationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<ApplicationDto> dtos = applicationService.getApplicationsByUser(user).stream()
+        List<ApplicationDto> userApplications = applicationService.getApplicationsByUser(user).stream()
                 .map(applicationMapper::toDto)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(userApplications);
     }
 }

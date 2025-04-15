@@ -1,61 +1,60 @@
 package org.qbit.applicationmanager.infrastructure.http;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.qbit.applicationmanager.domain.model.Application;
-import org.qbit.applicationmanager.domain.model.Enterprise;
-import org.qbit.applicationmanager.domain.model.Task;
-import org.qbit.applicationmanager.domain.model.User;
-import org.qbit.applicationmanager.domain.service.EnterpriseService;
-
+import org.qbit.applicationmanager.domain.model.*;
+import org.qbit.applicationmanager.domain.service.ApplicationService;
 import org.qbit.applicationmanager.domain.service.TaskService;
+import org.qbit.applicationmanager.domain.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-@ExtendWith(MockitoExtension.class)
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SuppressWarnings("removal")
 @WebMvcTest(TaskController.class)
-public class TaskControllerTest {
+class TaskControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @MockBean
     private TaskService taskService;
 
-    @InjectMocks
-    private TaskController taskController;
+    @MockBean
+    private UserService userService;
 
-    @TestConfiguration
-    static class MockConfig {
-        @Bean
-        public TaskService taskService() {
-            return mock(TaskService.class);
-        }
-    }
+    @MockBean
+    private ApplicationService applicationService;
 
     @Test
-    @WithMockUser(username = "testUser", roles = "USER")
+    @WithMockUser(username = "testUser")
     void shouldGetTaskById() throws Exception {
-        Task task = new Task(new User("testUser", "hashedPassword"),
-                new Application(new User("testUser", "hashedPassword"),
-                        new Enterprise("Test Enterprise", new User("testUser", "hashedPassword")),
-                        "Test Notes","Test Name"),
-                LocalDateTime.now().plusDays(1),
-                "Task Note");
+        User user = new User("testUser", "hashedPassword");
+        Field filedUserId = User.class.getDeclaredField("userId");
+        filedUserId.setAccessible(true);
+        filedUserId.set(user, 1L);
+
+        Enterprise enterprise = new Enterprise("Test Enterprise", user);
+        Application application = new Application(user, enterprise, "notes", "app name", ApplicationStatus.DRAFT);
+        Field fieldApplicationId = Application.class.getDeclaredField("applicationId");
+        fieldApplicationId.setAccessible(true);
+        fieldApplicationId.set(application, 1L);
+
+        Task task = new Task(user, application, LocalDateTime.now().plusDays(1), "Task Note");
+        Field filedTaskId = Task.class.getDeclaredField("taskId");
+        filedTaskId.setAccessible(true);
+        filedTaskId.set(task, 1L);
+
+        when(userService.getUserByUsername("testUser")).thenReturn(user);
         when(taskService.getTaskById(1L)).thenReturn(Optional.of(task));
 
         mockMvc.perform(get("/api/tasks/1"))

@@ -11,7 +11,7 @@ public class TaskEntityTest {
     public void testTaskEntity_Creation() {
         User user = new User("testUser", "hashedPassword");
         Enterprise enterprise = new Enterprise("TestEnterprise", user);
-        Application application = new Application(user, enterprise, "TestNotes","Test Name");
+        Application application = new Application(user, enterprise, "TestNotes","Test Name",ApplicationStatus.DRAFT);
         LocalDateTime dueDate = LocalDateTime.now().plusDays(3);
 
         Task task = new Task(user, application, dueDate, "Test Task");

@@ -1,17 +1,18 @@
 package org.qbit.applicationmanager.infrastructure.http;
 
+import java.util.List;
+
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.service.EnterpriseService;
 import org.qbit.applicationmanager.domain.service.UserService;
 import org.qbit.applicationmanager.infrastructure.http.dto.EnterpriseDto;
 import org.qbit.applicationmanager.infrastructure.http.dto.mapper.EnterpriseMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.security.core.Authentication;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/enterprises")
@@ -39,14 +40,37 @@ public class EnterpriseController {
     @GetMapping("/{id}")
     public ResponseEntity<EnterpriseDto> getEnterprise(@PathVariable Long id, Authentication authentication) {
         return enterpriseService.getEnterpriseById(id)
-                .map(enterprise -> {
-                    String username = authentication.getName();
-                    if (!belongsToUser(enterprise, username)) {
-                        return ResponseEntity.status(403).<EnterpriseDto>build();
-                    }
-                    return ResponseEntity.ok(enterpriseMapper.toDto(enterprise));
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(enterprise -> getEnterpriseDtoResponseEntity(authentication, enterprise))
+                .orElseGet(this::getNotFoundResponseEntry);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<EnterpriseDto>> getEnterprisesForCurrentUser(Authentication authentication) {
+        User user = userService.getUserByUsername(authentication.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<EnterpriseDto> userEnterprises = enterpriseService.getEnterprisesByUser(user)
+                .stream()
+                .map(enterpriseMapper::toDto)
+                .toList();
+
+        return ResponseEntity.ok(userEnterprises);
+    }
+
+    private ResponseEntity<EnterpriseDto> getNotFoundResponseEntry() {
+        return ResponseEntity.notFound().build();
+    }
+
+    private ResponseEntity<EnterpriseDto> getEnterpriseDtoResponseEntity(Authentication authentication, Enterprise enterprise) {
+        String username = authentication.getName();
+        if (!belongsToUser(enterprise, username)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .build();
+        }
+        return ResponseEntity.ok(enterpriseMapper.toDto(enterprise));
     }
 
     private boolean belongsToUser(Enterprise enterprise, String username) {
@@ -55,4 +79,5 @@ public class EnterpriseController {
         }
         return enterprise.getUser().getUserName().equals(username);
     }
+
 }

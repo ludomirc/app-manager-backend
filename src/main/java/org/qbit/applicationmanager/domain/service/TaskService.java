@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TaskService {
-    Task createTask(User user, Application application, String note);
+    Task createTask(Task task);
     Optional<Task> getTaskById(Long id);
     List<Task> getTasksByUser(User user);
     List<Task> getTasksByApplication(Application application);
-    void deleteTask(Long id);
 }

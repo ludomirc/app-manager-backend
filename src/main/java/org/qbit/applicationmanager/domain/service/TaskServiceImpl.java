@@ -19,8 +19,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task createTask(User user, Application application, String note) {
-        Task task = new Task(user, application, null, note);
+    public Task createTask(Task task) {
         return taskRepository.save(task);
     }
 
@@ -37,10 +36,5 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> getTasksByApplication(Application application) {
         return taskRepository.findByApplication(application);
-    }
-
-    @Override
-    public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
     }
 }

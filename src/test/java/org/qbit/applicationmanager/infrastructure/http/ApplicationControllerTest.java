@@ -2,9 +2,11 @@ package org.qbit.applicationmanager.infrastructure.http;
 
 import org.junit.jupiter.api.Test;
 import org.qbit.applicationmanager.domain.model.Application;
+import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
+import org.qbit.applicationmanager.domain.service.ApplicationStatusChangeService;
 import org.qbit.applicationmanager.domain.service.EnterpriseService;
 import org.qbit.applicationmanager.domain.service.UserService;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationDto;
@@ -45,6 +47,9 @@ class ApplicationControllerTest {
     @MockBean
     private ApplicationMapper applicationMapper;
 
+    @MockBean
+    private ApplicationStatusChangeService applicationStatusChangeService;
+
     @TestConfiguration
     static class MockConfig {
         @Bean
@@ -63,13 +68,13 @@ class ApplicationControllerTest {
         field.set(user, 1L);
 
         Enterprise enterprise = new Enterprise("Test Enterprise", user);
-        Application application = new Application(user, enterprise, "Test Notes","Test Name");
+        Application application = new Application(user, enterprise, "Test Notes","Test Name", ApplicationStatus.DRAFT);
 
         // Mock service calls
         when(userService.getUserByUsername("testUser")).thenReturn(user);
         when(applicationService.getApplicationById(1L)).thenReturn(Optional.of(application));
         when(applicationMapper.toDto(application)).thenReturn(
-                new ApplicationDto(1L, null, "Test Enterprise", application.getCreationDate(), "Test Notes", "Test name")
+                new ApplicationDto(1L, null, "Test Enterprise", application.getCreationDate(), "Test Notes", "Test name", ApplicationStatus.DRAFT.name())
         );
 
         // When + Then
