@@ -5,17 +5,26 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "app_user")
+@Table(
+        name = "app_user",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "UK_USER_USERNAME",
+                        columnNames = {"user_name"}
+                )
+        }
+)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(name = "user_name", nullable = false, length = 255)
     private String userName;
 
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     public User() {

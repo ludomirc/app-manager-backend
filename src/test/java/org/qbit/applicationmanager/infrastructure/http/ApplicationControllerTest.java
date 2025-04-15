@@ -5,12 +5,10 @@ import org.qbit.applicationmanager.domain.model.Application;
 import org.qbit.applicationmanager.domain.model.ApplicationStatus;
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
-import org.qbit.applicationmanager.domain.service.ApplicationService;
-import org.qbit.applicationmanager.domain.service.ApplicationStatusChangeService;
-import org.qbit.applicationmanager.domain.service.EnterpriseService;
-import org.qbit.applicationmanager.domain.service.UserService;
+import org.qbit.applicationmanager.domain.service.*;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationDto;
 import org.qbit.applicationmanager.infrastructure.http.dto.mapper.ApplicationMapper;
+import org.qbit.applicationmanager.infrastructure.http.dto.mapper.TaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -49,6 +47,12 @@ class ApplicationControllerTest {
 
     @MockBean
     private ApplicationStatusChangeService applicationStatusChangeService;
+
+    @MockBean
+    private TaskService taskService;
+
+    @MockBean
+    private TaskMapper taskMapper;
 
     @TestConfiguration
     static class MockConfig {

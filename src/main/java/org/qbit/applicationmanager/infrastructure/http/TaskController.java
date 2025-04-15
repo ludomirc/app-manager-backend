@@ -1,10 +1,9 @@
 package org.qbit.applicationmanager.infrastructure.http;
 
-import org.qbit.applicationmanager.domain.model.Application;
-import org.qbit.applicationmanager.domain.model.User;
-import org.qbit.applicationmanager.domain.model.Task;
+import org.qbit.applicationmanager.domain.model.*;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
 import org.qbit.applicationmanager.domain.service.TaskService;
+import org.qbit.applicationmanager.domain.service.TaskStatusChangeService;
 import org.qbit.applicationmanager.domain.service.UserService;
 import org.qbit.applicationmanager.infrastructure.http.dto.TaskDto;
 import org.qbit.applicationmanager.infrastructure.http.dto.mapper.TaskMapper;
@@ -22,11 +21,15 @@ public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
     private final ApplicationService applicationService;
+    private final TaskMapper taskMapper;
+    private final TaskStatusChangeService taskStatusChangeService;
 
-    public TaskController(TaskService taskService, UserService userService, ApplicationService applicationService) {
+    public TaskController(TaskService taskService, UserService userService, ApplicationService applicationService, TaskMapper taskMapper, TaskStatusChangeService taskStatusChangeService) {
         this.taskService = taskService;
         this.userService = userService;
         this.applicationService = applicationService;
+        this.taskMapper = taskMapper;
+        this.taskStatusChangeService = taskStatusChangeService;
     }
 
     @PostMapping
@@ -47,9 +50,13 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Task task = TaskMapper.fromDto(dto, user, application);
+        Task task = taskMapper.fromDto(dto, user, application);
         Task savedTask = taskService.createTask(task);
-        return ResponseEntity.ok(TaskMapper.toDto(savedTask));
+
+        TaskStatusChange taskStatusChange = new TaskStatusChange(task, task.getStatus(),user);
+        taskStatusChangeService.recordStatusChange(taskStatusChange);
+
+        return ResponseEntity.ok(taskMapper.toDto(savedTask));
     }
 
     @GetMapping("/{id}")
@@ -61,7 +68,7 @@ public class TaskController {
 
         return taskService.getTaskById(id)
                 .filter(task -> task.getUser().getUserId().equals(user.getUserId()))
-                .map(TaskMapper::toDto)
+                .map(taskMapper::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
     }

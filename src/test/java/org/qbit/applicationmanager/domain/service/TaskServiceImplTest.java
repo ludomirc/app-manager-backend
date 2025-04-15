@@ -35,14 +35,14 @@ class TaskServiceImplTest {
     void setUp() {
         user = new User("testUser", "passwordHash");
         application = new Application(user, new Enterprise("Test Enterprise", user), "Test Notes","Test Name", ApplicationStatus.DRAFT);
-        task = new Task(user, application, LocalDateTime.now().plusDays(1), "Task Note");
+        task = new Task(user, application, LocalDateTime.now().plusDays(1), "Task Note",TaskStatus.PENDING, "Test Name");
     }
 
     @Test
     void shouldCreateTask() {
         when(taskRepository.save(ArgumentMatchers.any(Task.class))).thenReturn(task);
 
-        Task expectedTask = new Task(user, application,null, "Task Note");
+        Task expectedTask = new Task(user, application,null, "Task Note",TaskStatus.PENDING, "Test Name");
 
         Task createdTask = taskService.createTask(expectedTask);
 
@@ -50,6 +50,7 @@ class TaskServiceImplTest {
         assertThat(createdTask.getUser(), equalTo(user));
         assertThat(createdTask.getApplication(), equalTo(application));
         assertThat(createdTask.getNote(), equalTo("Task Note"));
+        assertThat(createdTask.getStatus(), equalTo(TaskStatus.PENDING));
     }
 
     @Test

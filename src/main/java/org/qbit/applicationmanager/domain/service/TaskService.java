@@ -11,4 +11,6 @@ public interface TaskService {
     Optional<Task> getTaskById(Long id);
     List<Task> getTasksByUser(User user);
     List<Task> getTasksByApplication(Application application);
+    List<Task> getTasksByApplicationId(Long taskId);
+    Optional<Task> updateTask(Task task);
 }

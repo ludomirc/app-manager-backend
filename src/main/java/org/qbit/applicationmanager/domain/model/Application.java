@@ -10,25 +10,35 @@ import java.util.Objects;
         name = "application",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_application_user_name_enterprise",
-                        columnNames = {"user_id", "name", "enterprise_id" })
+                        name = "UK_APPLICATION_USER_NAME_ENTERPRISE",
+                        columnNames = {"user_id", "name", "enterprise_id"}
+                )
         }
 )
 public class Application {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "application_id")
     private Long applicationId;
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_APPLICATION_USER")
+    )
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "enterprise_id", nullable = false)
+    @JoinColumn(
+            name = "enterprise_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_APPLICATION_ENTERPRISE")
+    )
     private Enterprise enterprise;
 
     @Column(name = "creation_date", nullable = false)

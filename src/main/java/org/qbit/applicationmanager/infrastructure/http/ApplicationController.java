@@ -6,9 +6,12 @@ import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
 import org.qbit.applicationmanager.domain.service.EnterpriseService;
+import org.qbit.applicationmanager.domain.service.TaskService;
 import org.qbit.applicationmanager.domain.service.UserService;
 import org.qbit.applicationmanager.infrastructure.http.dto.ApplicationDto;
+import org.qbit.applicationmanager.infrastructure.http.dto.TaskDto;
 import org.qbit.applicationmanager.infrastructure.http.dto.mapper.ApplicationMapper;
+import org.qbit.applicationmanager.infrastructure.http.dto.mapper.TaskMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -26,15 +29,21 @@ public class ApplicationController {
     private final UserService userService;
     private final ApplicationMapper applicationMapper;
     private final EnterpriseService enterpriseService;
+    private final TaskService taskService;
+    private final TaskMapper taskMapper;
 
     public ApplicationController(ApplicationService applicationService,
                                  UserService userService,
                                  ApplicationMapper applicationMapper,
-                                 EnterpriseService enterpriseService) {
+                                 EnterpriseService enterpriseService,
+                                 TaskService taskService,
+                                 TaskMapper taskMapper) {
         this.applicationService = applicationService;
         this.userService = userService;
         this.applicationMapper = applicationMapper;
         this.enterpriseService = enterpriseService;
+        this.taskService = taskService;
+        this.taskMapper = taskMapper;
     }
 
     @PostMapping
@@ -95,5 +104,13 @@ public class ApplicationController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(userApplications);
+    }
+
+    @GetMapping("/{id}/tasks")
+    public ResponseEntity<List<TaskDto>> getTasksForApplication(@PathVariable Long id) {
+        List<TaskDto> tasks = taskService.getTasksByApplicationId(id).stream()
+                .map(taskMapper::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(tasks);
     }
 }

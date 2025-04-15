@@ -5,9 +5,12 @@ import org.qbit.applicationmanager.domain.model.*;
 import org.qbit.applicationmanager.domain.service.ApplicationService;
 import org.qbit.applicationmanager.domain.service.TaskService;
 import org.qbit.applicationmanager.domain.service.UserService;
+import org.qbit.applicationmanager.domain.service.TaskStatusChangeService;
+import org.qbit.applicationmanager.infrastructure.http.dto.mapper.TaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SuppressWarnings("removal")
 @WebMvcTest(TaskController.class)
+@Import(TaskMapper.class)
 class TaskControllerTest {
 
     @Autowired
@@ -34,6 +38,9 @@ class TaskControllerTest {
 
     @MockBean
     private ApplicationService applicationService;
+
+    @MockBean
+    private TaskStatusChangeService taskStatusChangeService;
 
     @Test
     @WithMockUser(username = "testUser")
@@ -49,7 +56,7 @@ class TaskControllerTest {
         fieldApplicationId.setAccessible(true);
         fieldApplicationId.set(application, 1L);
 
-        Task task = new Task(user, application, LocalDateTime.now().plusDays(1), "Task Note");
+        Task task = new Task(user, application, LocalDateTime.now().plusDays(1), "Task Note", TaskStatus.PENDING, "Test Name");
         Field filedTaskId = Task.class.getDeclaredField("taskId");
         filedTaskId.setAccessible(true);
         filedTaskId.set(task, 1L);
