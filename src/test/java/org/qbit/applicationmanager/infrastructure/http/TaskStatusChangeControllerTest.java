@@ -66,7 +66,7 @@ class TaskStatusChangeControllerTest {
         TaskStatusChangeDto requestDto = new TaskStatusChangeDto(null, 1L, "IN_PROGRESS", LocalDateTime.now(), null);
         TaskStatusChangeDto responseDto = new TaskStatusChangeDto(1L, 1L, "IN_PROGRESS", requestDto.getChangedAt(), 1L);
 
-        when(userService.getUserByUsername("testUser")).thenReturn(user);
+        when(userService.getUserByUserName("testUser")).thenReturn(Optional.of(user));
         when(taskService.getTaskById(1L)).thenReturn(Optional.of(task));
         when(statusChangeService.recordStatusChange(task, TaskStatus.IN_PROGRESS, user)).thenReturn(change);
         when(mapper.toDto(change)).thenReturn(responseDto);

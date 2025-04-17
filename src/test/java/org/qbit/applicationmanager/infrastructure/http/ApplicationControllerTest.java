@@ -75,7 +75,7 @@ class ApplicationControllerTest {
         Application application = new Application(user, enterprise, "Test Notes","Test Name", ApplicationStatus.DRAFT);
 
         // Mock service calls
-        when(userService.getUserByUsername("testUser")).thenReturn(user);
+        when(userService.getUserByUserName("testUser")).thenReturn(Optional.of(user));
         when(applicationService.getApplicationById(1L)).thenReturn(Optional.of(application));
         when(applicationMapper.toDto(application)).thenReturn(
                 new ApplicationDto(1L, null, "Test Enterprise", application.getCreationDate(), "Test Notes", "Test name", ApplicationStatus.DRAFT.name())

@@ -34,7 +34,7 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto dto, Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
+        Optional<User> user = userService.getUserByUserName(authentication.getName());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -46,14 +46,14 @@ public class TaskController {
 
         Application application = applicationOpt.get();
 
-        if (!application.getUser().getUserId().equals(user.getUserId())) {
+        if (!application.getUser().getUserId().equals(user.get().getUserId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Task task = taskMapper.fromDto(dto, user, application);
+        Task task = taskMapper.fromDto(dto, user.get(), application);
         Task savedTask = taskService.createTask(task);
 
-        TaskStatusChange taskStatusChange = new TaskStatusChange(task, task.getStatus(),user);
+        TaskStatusChange taskStatusChange = new TaskStatusChange(task, task.getStatus(), user.get());
         taskStatusChangeService.recordStatusChange(taskStatusChange);
 
         return ResponseEntity.ok(taskMapper.toDto(savedTask));
@@ -61,13 +61,13 @@ public class TaskController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskDto> getTask(@PathVariable Long id, Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
+        Optional<User> user = userService.getUserByUserName(authentication.getName());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         return taskService.getTaskById(id)
-                .filter(task -> task.getUser().getUserId().equals(user.getUserId()))
+                .filter(task -> task.getUser().getUserId().equals(user.get().getUserId()))
                 .map(taskMapper::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).build());

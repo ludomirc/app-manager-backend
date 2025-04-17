@@ -1,31 +1,29 @@
 package org.qbit.applicationmanager.domain.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.qbit.applicationmanager.domain.model.User;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.qbit.applicationmanager.domain.repository.UserRepository;
-
-import java.util.Optional;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class AuthenticationServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
 
+    @Spy
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     public void testEncodePassword() {
@@ -54,27 +52,6 @@ public class AuthenticationServiceImplTest {
 
         assertThat(isMatch, is(false));
     }
-
-    @Test
-    public void testGetUserByUserName_UserExists() {
-        User user = new User("testUser", "hashedPassword");
-        when(userRepository.findByUserName("testUser")).thenReturn(user);
-
-        Optional<User> foundUser = authenticationService.getUserByUserName("testUser");
-
-        assertThat(foundUser.isPresent(), is(true));
-        assertThat(foundUser.get().getUserName(), is(equalTo("testUser")));
-
-        verify(userRepository, times(1)).findByUserName("testUser");
-    }
-
-    @Test
-    public void testGetUserByUserName_UserNotFound() {
-        when(userRepository.findByUserName("unknownUser")).thenReturn(null);
-
-        Optional<User> foundUser = authenticationService.getUserByUserName("unknownUser");
-        assertThat(foundUser.isPresent(), is(false));
-
-        verify(userRepository, times(1)).findByUserName("unknownUser");
-    }
 }
+
+

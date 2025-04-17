@@ -48,8 +48,8 @@ public class ApplicationController {
 
     @PostMapping
     public ResponseEntity<ApplicationDto> createApplication(@RequestBody ApplicationDto dto, Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
-        if (user == null) {
+        Optional<User> user = userService.getUserByUserName(authentication.getName());
+        if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -60,13 +60,13 @@ public class ApplicationController {
 
         Optional<User> enterpriseUser = enterpriseOp
                 .map(Enterprise::getUser)
-                .filter(enUser -> isTheSameUser(user, enUser));
+                .filter(enUser -> isTheSameUser(user.get(), enUser));
 
         if (enterpriseUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        Application application = applicationMapper.fromDto(dto, user, enterpriseOp.get());
+        Application application = applicationMapper.fromDto(dto, user.get(), enterpriseOp.get());
         application.setCurrentStatus(ApplicationStatus.DRAFT);
         Application savedApplication = applicationService.createApplication(application);
         ApplicationDto responseDto = applicationMapper.toDto(savedApplication);
@@ -80,13 +80,13 @@ public class ApplicationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationDto> getApplication(@PathVariable Long id, Authentication authentication) {
-        User currentUser = userService.getUserByUsername(authentication.getName());
-        if (currentUser == null) {
+        Optional<User> currentUser = userService.getUserByUserName(authentication.getName());
+        if (currentUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         return applicationService.getApplicationById(id)
-                .filter(app -> app.getUser().getUserId().equals(currentUser.getUserId()))
+                .filter(app -> app.getUser().getUserId().equals(currentUser.get().getUserId()))
                 .map(applicationMapper::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
@@ -94,12 +94,12 @@ public class ApplicationController {
 
     @GetMapping
     public ResponseEntity<List<ApplicationDto>> getApplicationsForCurrentUser(Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
-        if (user == null) {
+        Optional<User> user = userService.getUserByUserName(authentication.getName());
+        if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<ApplicationDto> userApplications = applicationService.getApplicationsByUser(user).stream()
+        List<ApplicationDto> userApplications = applicationService.getApplicationsByUser(user.get()).stream()
                 .map(applicationMapper::toDto)
                 .collect(Collectors.toList());
 

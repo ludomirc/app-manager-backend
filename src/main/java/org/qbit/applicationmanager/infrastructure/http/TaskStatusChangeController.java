@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,13 +36,13 @@ public class TaskStatusChangeController {
 
     @GetMapping("/task/{taskId}")
     public ResponseEntity<List<TaskStatusChangeDto>> getStatusChangesByTaskId(@PathVariable Long taskId, Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
+        Optional<User> user = userService.getUserByUserName(authentication.getName());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Task task = taskService.getTaskById(taskId).orElse(null);
-        if (task == null || !task.getUser().getUserId().equals(user.getUserId())) {
+        if (task == null || !task.getUser().getUserId().equals(user.get().getUserId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -56,20 +57,20 @@ public class TaskStatusChangeController {
             @RequestBody TaskStatusChangeDto request,
             Authentication authentication) {
 
-        User user = userService.getUserByUsername(authentication.getName());
+        Optional<User> user = userService.getUserByUserName(authentication.getName());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Task task = taskService.getTaskById(taskId).orElse(null);
-        if (task == null || !task.getUser().getUserId().equals(user.getUserId())) {
+        if (task == null || !task.getUser().getUserId().equals(user.get().getUserId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         TaskStatus status = TaskStatus.valueOf(request.getStatus());
         task.setStatus(status);
         taskService.updateTask(task);
-        TaskStatusChange change = taskStatusChangeService.recordStatusChange(task, status, user);
+        TaskStatusChange change = taskStatusChangeService.recordStatusChange(task, status, user.get());
         return ResponseEntity.ok(taskStatusChangeMapper.toDto(change));
     }
 }

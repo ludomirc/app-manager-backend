@@ -61,7 +61,7 @@ class TaskControllerTest {
         filedTaskId.setAccessible(true);
         filedTaskId.set(task, 1L);
 
-        when(userService.getUserByUsername("testUser")).thenReturn(user);
+        when(userService.getUserByUserName("testUser")).thenReturn(Optional.of(user));
         when(taskService.getTaskById(1L)).thenReturn(Optional.of(task));
 
         mockMvc.perform(get("/api/tasks/1"))
