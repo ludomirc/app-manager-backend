@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 @Service
 public class JwtService {
 
@@ -19,8 +21,11 @@ public class JwtService {
     @Value("${app.jwt.expiration-ms:3600000}") // default 1 hour
     private long jwtExpirationMs;
 
+    @Value("${app.jwt.issuer-uri:}")
+    private String issuerUri;
+
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes(UTF_8));
     }
 
     public String generateToken(String username) {
@@ -28,13 +33,18 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, String username) {
-        return Jwts.builder()
+        JwtBuilder builder = Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256);
+
+        if (!issuerUri.isBlank()) {
+            builder.setIssuer(issuerUri);
+        }
+
+        return builder.compact();
     }
 
     public boolean isTokenValid(String token, String expectedUsername) {
