@@ -14,7 +14,7 @@ public class TaskEntityTest {
         Application application = new Application(user, enterprise, "TestNotes","Test Name",ApplicationStatus.DRAFT);
         LocalDateTime dueDate = LocalDateTime.now().plusDays(3);
 
-        Task task = new Task(user, application, dueDate, "Test Task");
+        Task task = new Task(user, application, dueDate, "Test Task",TaskStatus.PENDING, "Test Name");
 
         assertThat(task, is(notNullValue()));
         assertThat(task.getUser(), is(notNullValue()));

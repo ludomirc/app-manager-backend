@@ -8,34 +8,57 @@ import java.util.Objects;
 @Table(
         name = "enterprise",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "name"})
+                @UniqueConstraint(
+                        name = "UK_ENTERPRISE_USER_NAME",
+                        columnNames = {"user_id", "name"}
+                )
         }
 )
 public class Enterprise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "enterprise_id")
     private Long enterpriseId;
 
     @Column(nullable = false, length = 255)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_ENTERPRISE_USER")
+    )
     private User user;
 
-    public Enterprise() {}
+    public Enterprise() {
+    }
 
     public Enterprise(String name, User user) {
         this.name = name;
         this.user = user;
     }
 
-    public Long getEnterpriseId() { return enterpriseId; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public Long getEnterpriseId() {
+        return enterpriseId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     @Override
     public boolean equals(Object o) {

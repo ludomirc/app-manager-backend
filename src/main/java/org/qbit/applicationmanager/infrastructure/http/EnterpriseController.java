@@ -1,6 +1,7 @@
 package org.qbit.applicationmanager.infrastructure.http;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.qbit.applicationmanager.domain.model.Enterprise;
 import org.qbit.applicationmanager.domain.model.User;
@@ -31,8 +32,8 @@ public class EnterpriseController {
     @PostMapping
     public ResponseEntity<EnterpriseDto> createEnterprise(@RequestBody EnterpriseDto enterpriseDto, Authentication authentication) {
         String username = authentication.getName();
-        User user = userService.getUserByUsername(username);
-        Enterprise enterprise = enterpriseService.createEnterprise(enterpriseDto.getName(), user);
+        Optional<User> user = userService.getUserByUserName(username);
+        Enterprise enterprise = enterpriseService.createEnterprise(enterpriseDto.getName(), user.get());
         EnterpriseDto outputDto = enterpriseMapper.toDto(enterprise);
         return ResponseEntity.ok(outputDto);
     }
@@ -46,12 +47,12 @@ public class EnterpriseController {
 
     @GetMapping
     public ResponseEntity<List<EnterpriseDto>> getEnterprisesForCurrentUser(Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
-        if (user == null) {
+        Optional<User> user = userService.getUserByUserName(authentication.getName());
+        if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<EnterpriseDto> userEnterprises = enterpriseService.getEnterprisesByUser(user)
+        List<EnterpriseDto> userEnterprises = enterpriseService.getEnterprisesByUser(user.get())
                 .stream()
                 .map(enterpriseMapper::toDto)
                 .toList();

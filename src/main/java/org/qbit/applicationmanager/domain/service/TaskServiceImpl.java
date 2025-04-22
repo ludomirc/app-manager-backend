@@ -6,6 +6,7 @@ import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -36,5 +37,15 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> getTasksByApplication(Application application) {
         return taskRepository.findByApplication(application);
+    }
+
+    @Override
+    public List<Task> getTasksByApplicationId(Long applicationId) {
+        return taskRepository.findByApplicationId(applicationId);
+    }
+
+    @Override
+    public Optional<Task> updateTask(Task task) {
+        return Optional.ofNullable(taskRepository.save(task));
     }
 }

@@ -44,24 +44,4 @@ class UserServiceImplTest {
         assertThat(registeredUser.getUserName(), equalTo("testUser"));
         assertThat(registeredUser.getPasswordHash(), equalTo("hashedPassword")); // Ensuring password is hashed
     }
-
-    @Test
-    void shouldAuthenticateUserWithCorrectPassword() {
-        when(userRepository.findByUserName("testUser")).thenReturn(user);
-        when(authenticationService.verifyPassword("rawPassword", "hashedPassword")).thenReturn(true);
-
-        boolean isAuthenticated = userService.authenticateUser("testUser", "rawPassword");
-
-        assertThat(isAuthenticated, is(true));
-    }
-
-    @Test
-    void shouldNotAuthenticateUserWithIncorrectPassword() {
-        when(userRepository.findByUserName("testUser")).thenReturn(user);
-        when(authenticationService.verifyPassword("wrongPassword", "hashedPassword")).thenReturn(false);
-
-        boolean isAuthenticated = userService.authenticateUser("testUser", "wrongPassword");
-
-        assertThat(isAuthenticated, is(false));
-    }
 }

@@ -1,6 +1,7 @@
 package org.qbit.applicationmanager.domain.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -13,17 +14,22 @@ public class ApplicationStatusChange {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "application_id", nullable = false)
+    @JoinColumn(
+            name = "application_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_APP_STATUS_CHANGE_APPLICATION")
+    )
     private Application application;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApplicationStatus status;
 
-    @Column(nullable = false)
+    @Column(name = "changed_at", nullable = false)
     private LocalDateTime changedAt = LocalDateTime.now();
 
-    public ApplicationStatusChange() {}
+    public ApplicationStatusChange() {
+    }
 
     public ApplicationStatusChange(Application application, ApplicationStatus status) {
         this.application = application;
@@ -31,13 +37,33 @@ public class ApplicationStatusChange {
         this.changedAt = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public Application getApplication() { return application; }
-    public void setApplication(Application application) { this.application = application; }
-    public ApplicationStatus getStatus() { return status; }
-    public void setStatus(ApplicationStatus status) { this.status = status; }
-    public LocalDateTime getChangedAt() { return changedAt; }
-    public void setChangedAt(LocalDateTime changedAt) { this.changedAt = changedAt; }
+    public Long getId() {
+        return id;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
+    public ApplicationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ApplicationStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getChangedAt() {
+        return changedAt;
+    }
+
+    public void setChangedAt(LocalDateTime changedAt) {
+        this.changedAt = changedAt;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -4,6 +4,8 @@ import org.qbit.applicationmanager.domain.model.User;
 import org.qbit.applicationmanager.domain.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -23,12 +25,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean authenticateUser(String userName, String rawPassword) {
-        User user = userRepository.findByUserName(userName);
-        return user != null && authenticationService.verifyPassword(rawPassword, user.getPasswordHash());
-    }
-
-    public User getUserByUsername(String userName) {
-        return userRepository.findByUserName(userName);
+    public Optional<User> getUserByUserName(String userName) {
+        return Optional.ofNullable(userRepository.findByUserName(userName));
     }
 }
